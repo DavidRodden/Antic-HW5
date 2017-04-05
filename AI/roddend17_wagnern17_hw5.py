@@ -37,6 +37,10 @@ class AIPlayer(Player):
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
 
+    def map_input(state):
+
+        return []   # return a list of inputs from the mapping function
+
     @staticmethod
     def score_state(state):
         """
