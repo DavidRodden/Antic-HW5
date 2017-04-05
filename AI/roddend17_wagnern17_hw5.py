@@ -37,7 +37,164 @@ class AIPlayer(Player):
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
 
+    """
+    Description:
+        Maps a set of inputs from a GameState into a list, that will then
+        be input into the Neural Network.
+
+    Parameters:
+        state - GameState to score.
+    """
     def map_input(state):
+
+        input_list = [] * 20; #init list to be rtn'd at a <--CURRENTLY ARBITRARY--> value of 20
+
+        enemy_id = abs(state.whoseTurn - 1)
+        our_inv = utils.getCurrPlayerInventory(state)
+        enemy_inv = [
+            inv for inv in state.inventories if inv.player == enemy_id].pop()
+        GOOD = 1
+        BAD = 0
+        we_win = 1.0
+        enemy_win = 0.0
+        our_food = our_inv.foodCount
+        enemy_food = enemy_inv.foodCount
+        food_difference = abs(our_food - enemy_food)
+        our_anthill = our_inv.getAnthill()
+        our_tunnel = our_inv.getTunnels()[0]
+        enemy_anthill = enemy_inv.getAnthill()
+        our_queen = our_inv.getQueen()
+        enemy_queen = enemy_inv.getQueen()
+        food_drop_offs = [our_tunnel.coords]
+        food_drop_offs.append(our_anthill.coords)
+
+        # input_list[0]: If our number of food is good or bad
+        # Downside: incentivises AI to not spend food until it has 
+        #           1 over however many it takes to make an ant
+        if food_difference > 0:
+            input_list[0] = GOOD
+
+        # input_list[1]: If our workers are carrying or depositing food it's good
+        our_workers = [ant for ant in our_inv.ants if ant.type == c.WORKER]
+
+        carrying_workers = [ant for ant in our_workers if ant.carrying]
+
+        dropping_off = [
+            ant for ant in our_workers if ant.coords in food_drop_offs and ant.carrying]
+
+        if len(dropping_off) != 0:
+            input_list[1] = GOOD
+        elif len(carrying_workers) != 0:
+            input_list[1] = GOOD
+        else:
+            input_list[1] = BAD
+
+        # Worker movement
+        for ant in our_workers:
+            ant_x = ant.coords[0]
+            ant_y = ant.coords[1]
+            for enemy in enemy_inv.ants:
+                if ((abs(ant_x - enemy.coords[0]) > 3) and
+                        (abs(ant_y - enemy.coords[1]) > 3)):
+                    good_points += 60
+                    total_points += 60
+            if ant.carrying and ant not in dropping_off:
+                # Good if carrying ants move toward a drop off.
+                total_points += food_move
+                good_points += food_move
+
+                for dist in range(2, 4):
+                    for dropoff in food_drop_offs:
+                        if ((abs(ant_x - dropoff[0]) < dist) and
+                                (abs(ant_y - dropoff[1]) < dist)):
+                            good_points += food_move - (dist * 25)
+                            total_points += food_move - (dist * 25)
+
+        # Raw ant numbers comparison
+        total_points += (len(our_inv.ants) + len(enemy_inv.ants)) * 10
+        good_points += len(our_inv.ants) * 10
+
+        # Weighted ant types
+        # Workers, first 3 are worth 10, the rest are penalized
+        enemy_workers = [ant for ant in enemy_inv.ants if ant.type == c.WORKER]
+        if len(our_workers) <= 3:
+            total_points += len(our_workers) * 10
+            good_points += len(our_workers) * 10
+        else:
+            return 0.001
+        total_points += len(enemy_workers) * 50
+
+        # prefer workers to not leave home range
+        our_range = [(x, y) for x in xrange(10) for y in xrange(5)]
+        if len([ant for ant in our_workers if ant.coords not in our_range]) != 0:
+            return .001
+
+        # Offensive ants
+        # Let's just say each ant is worth 20x its cost for now
+        offensive = [c.SOLDIER, c.R_SOLDIER, c.DRONE]
+        our_offense = [ant for ant in our_inv.ants if ant.type in offensive]
+        enemy_offense = [
+            ant for ant in enemy_inv.ants if ant.type in offensive]
+
+        for ant in our_offense:
+            ant_x = ant.coords[0]
+            ant_y = ant.coords[1]
+            attack_move = 160
+            good_points += UNIT_STATS[ant.type][c.COST] * 20
+            total_points += UNIT_STATS[ant.type][c.COST] * 20
+            # good if on enemy anthill
+            if ant.coords == enemy_anthill.coords:
+                total_points += 100
+                good_points += 100
+            for enemy_ant in enemy_inv.ants:
+                enemy_x = enemy_ant.coords[0]
+                enemy_y = enemy_ant.coords[1]
+                x_dist = abs(ant_x - enemy_x)
+                y_dist = abs(ant_y - enemy_y)
+
+                # good if attacker ant attacks
+                if x_dist + y_dist == 1:
+                    good_points += attack_move * 2
+                    total_points += attack_move * 2
+
+                # weighted more if closer to attacking
+                for dist in xrange(1, 8):
+                    if x_dist < dist and y_dist < dist:
+                        good_points += attack_move - (dist * 20)
+                        total_points += attack_move - (dist * 20)
+
+        for ant in enemy_offense:
+            total_points += UNIT_STATS[ant.type][c.COST] * 60
+
+        # Stop building if we have more than 5 ants
+        if len(our_inv.ants) > 5:
+            total_points += 300
+
+        # Queen stuff
+        # Queen healths, big deal, each HP is worth 100!
+        total_points += (our_queen.health + enemy_queen.health) * 100
+        good_points += our_queen.health * 100
+        queen_coords = our_queen.coords
+        if queen_coords in food_drop_offs or queen_coords[1] > 2:
+            # Stay off food_drop_offs and away from the front lines.
+            # return .001
+            total_points += 300
+
+        # queen attacks if under threat
+        for enemy_ant in enemy_inv.ants:
+            enemy_x = enemy_ant.coords[0]
+            enemy_y = enemy_ant.coords[1]
+            x_dist = abs(queen_coords[0] - enemy_x)
+            y_dist = abs(queen_coords[1] - enemy_y)
+
+            if (x_dist + y_dist) == 1:
+                good_points += 200
+                total_points += 200
+
+        # Anthill stuff
+        total_points += (our_anthill.captureHealth +
+                         enemy_anthill.captureHealth) * 200
+        good_points += our_anthill.captureHealth * 200
 
         return []   # return a list of inputs from the mapping function
 
@@ -52,7 +209,7 @@ class AIPlayer(Player):
         Some metrics, like food difference, is weighted by difference between the two
         players.
 
-        Note: This is a staticmethod, it can be called without instanceing this class.
+        Note: This is a staticmethod, it can be called without instancing this class.
 
         Parameters:
             state - GameState to score.
