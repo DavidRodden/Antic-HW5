@@ -89,6 +89,8 @@ class AIPlayer(Player):
         else:
             input_list[1] = BAD
 
+        # <<---CODE BELOW HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
+
         # Worker movement
         for ant in our_workers:
             ant_x = ant.coords[0]
@@ -195,6 +197,9 @@ class AIPlayer(Player):
         total_points += (our_anthill.captureHealth +
                          enemy_anthill.captureHealth) * 200
         good_points += our_anthill.captureHealth * 200
+        
+
+        # <<---CODE ABOVE HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
 
         return []   # return a list of inputs from the mapping function
 
