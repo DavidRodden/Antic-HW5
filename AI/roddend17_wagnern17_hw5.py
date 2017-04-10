@@ -36,10 +36,150 @@ class AIPlayer(Player):
             inputPlayerId - The id to give the new player (int)
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
+        print "something happened"
 
+    """
+    Description:
+        Maps a set of inputs from a GameState into a list, that will then
+        be input into the Neural Network.
+
+    Parameters:
+        state - GameState to score.
+    """
+
+    @staticmethod
     def map_input(state):
 
-        return []   # return a list of inputs from the mapping function
+        input_list = [] * 12  # init list to be rtn'd
+
+        enemy_id = abs(state.whoseTurn - 1)
+        our_inv = utils.getCurrPlayerInventory(state)
+        enemy_inv = [
+            inv for inv in state.inventories if inv.player == enemy_id].pop()
+        GOOD = 1
+        BAD = 0
+        we_win = 1.0
+        enemy_win = 0.0
+        our_food = our_inv.foodCount
+        enemy_food = enemy_inv.foodCount
+        food_difference = abs(our_food - enemy_food)
+        our_anthill = our_inv.getAnthill()
+        our_tunnel = our_inv.getTunnels()[0]
+        enemy_anthill = enemy_inv.getAnthill()
+        our_queen = our_inv.getQueen()
+        enemy_queen = enemy_inv.getQueen()
+        food_drop_offs = [our_tunnel.coords]
+        food_drop_offs.append(our_anthill.coords)
+
+        # input_list[0]: If our number of food is good or bad
+        # Downside: incentivises AI to not spend food until it has
+        #           1 over however many it takes to make an ant
+
+        input_list.append(GOOD if food_difference > 0 else BAD)
+        # input_list[1]: If our workers are carrying or depositing food it's good
+        our_workers = [ant for ant in our_inv.ants if ant.type == c.WORKER]
+
+        carrying_workers = [ant for ant in our_workers if ant.carrying]
+
+        dropping_off = [
+            ant for ant in our_workers if ant.coords in food_drop_offs and ant.carrying]
+
+        input_list.append(GOOD if len(dropping_off) != 0 or len(carrying_workers) != 0 else BAD)
+
+        # input_list[2]: If our workers are moving in a constructive manner
+        movement_points = 0
+        food_move = 100
+        for ant in our_workers:
+            ant_x = ant.coords[0]
+            ant_y = ant.coords[1]
+            for enemy in enemy_inv.ants:
+                if ((abs(ant_x - enemy.coords[0]) > 3) and
+                        (abs(ant_y - enemy.coords[1]) > 3)):
+                    movement_points += 60
+            if ant.carrying and ant not in dropping_off:
+                # Good if carrying ants move toward a drop off.
+                movement_points += food_move
+
+                for dist in range(2, 4):
+                    for dropoff in food_drop_offs:
+                        if ((abs(ant_x - dropoff[0]) < dist) and
+                                (abs(ant_y - dropoff[1]) < dist)):
+                            movement_points += food_move - (dist * 25)
+        input_list.append(GOOD if movement_points >= 160 else BAD)  # testing for now, can be changed upwards
+
+        # input_list[3]: if we have an equal or greater amount of ants
+        input_list.append(GOOD if len(our_inv.ants) >= len(enemy_inv.ants) else BAD)
+
+        # input_list[4]: make sure we don't have too many workers
+        enemy_workers = [ant for ant in enemy_inv.ants if ant.type == c.WORKER]
+        input_list.append(GOOD if len(our_workers) < 3 else BAD)
+
+        # input_list[5]: make sure workers don't leave friendly half of board
+        our_range = [(x, y) for x in xrange(10) for y in xrange(5)]
+        input_list.append(BAD if len([ant for ant in our_workers if ant.coords not in our_range]) != 0 else GOOD)
+
+        # input_list[6]: make sure offensive ants are offensive
+        # Let's just say each ant is worth 20x its cost for now
+        offensive = [c.SOLDIER, c.R_SOLDIER, c.DRONE]
+        our_offense = [ant for ant in our_inv.ants if ant.type in offensive]
+        enemy_offense = [
+            ant for ant in enemy_inv.ants if ant.type in offensive]
+
+        offense_points = 0
+        for ant in our_offense:
+            ant_x = ant.coords[0]
+            ant_y = ant.coords[1]
+            attack_move = 160
+            offense_points += UNIT_STATS[ant.type][c.COST] * 20  # every units cost * 20 ~ 60
+            # good if on enemy anthill
+            if ant.coords == enemy_anthill.coords:
+                offense_points += 100  # ~ 160
+            for enemy_ant in enemy_inv.ants:
+                enemy_x = enemy_ant.coords[0]
+                enemy_y = enemy_ant.coords[1]
+                x_dist = abs(ant_x - enemy_x)
+                y_dist = abs(ant_y - enemy_y)
+
+                # good if attacker ant attacks
+                if x_dist + y_dist == 1:
+                    offense_points += attack_move * 2  # ~480
+
+                # weighted more if closer to attacking
+                for dist in xrange(1, 8):
+                    if x_dist < dist and y_dist < dist:
+                        offense_points += attack_move - (dist * 20)  # 160 - (3 * 20) = 100 ~580
+        input_list.append(GOOD if offense_points >= 290 else BAD)
+
+        # Stop building if we have more than 5 ants
+        input_list.append(BAD if our_inv.ants > 5 else GOOD)
+
+        # input_list[8]: Queen healths, big deal, it's being attacked it's bad
+        input_list.append(BAD if our_queen is not None and our_queen.health < 8 else GOOD)
+
+        # input_list[9]: Stay off food_drop_offs and away from the front lines
+
+        attack_points = 0
+
+        if our_queen is not None:
+            queen_coords = our_queen.coords
+            input_list.append(BAD if queen_coords in food_drop_offs or queen_coords[1] > 2 else GOOD)
+
+            # input_list[10]: queen attacks if under threat
+            for enemy_ant in enemy_inv.ants:
+                enemy_x = enemy_ant.coords[0]
+                enemy_y = enemy_ant.coords[1]
+                x_dist = abs(queen_coords[0] - enemy_x)
+                y_dist = abs(queen_coords[1] - enemy_y)
+
+                if (x_dist + y_dist) == 1:
+                    attack_points += 200
+
+        input_list.append(GOOD if attack_points >= 200 else BAD)
+
+        # Anthill stuff
+        input_list.append(BAD if our_anthill.captureHealth < 3 else GOOD)
+
+        return input_list  # returns the list we created
 
     @staticmethod
     def score_state(state):
@@ -52,7 +192,7 @@ class AIPlayer(Player):
         Some metrics, like food difference, is weighted by difference between the two
         players.
 
-        Note: This is a staticmethod, it can be called without instanceing this class.
+        Note: This is a staticmethod, it can be called without instancing this class.
 
         Parameters:
             state - GameState to score.
@@ -73,6 +213,9 @@ class AIPlayer(Player):
         enemy_queen = enemy_inv.getQueen()
         food_drop_offs = [our_tunnel.coords]
         food_drop_offs.append(our_anthill.coords)
+
+        temp_list = [] * 12
+        temp_list = AIPlayer.map_input(state)
 
         # Total points possible
         total_points = 1
@@ -250,7 +393,6 @@ class AIPlayer(Player):
         Returns:
             Move with the best score.
         """
-
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
 
