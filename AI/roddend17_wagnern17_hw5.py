@@ -47,9 +47,10 @@ class AIPlayer(Player):
         state - GameState to score.
     """
 
+    @staticmethod
     def map_input(state):
 
-        input_list = [] * 20  # init list to be rtn'd at a <--CURRENTLY ARBITRARY--> value of 20
+        input_list = [] * 12  # init list to be rtn'd
 
         enemy_id = abs(state.whoseTurn - 1)
         our_inv = utils.getCurrPlayerInventory(state)
@@ -246,6 +247,9 @@ class AIPlayer(Player):
         enemy_queen = enemy_inv.getQueen()
         food_drop_offs = [our_tunnel.coords]
         food_drop_offs.append(our_anthill.coords)
+
+        temp_list = [] * 12
+        temp_list = AIPlayer.map_input(state)
 
         # Total points possible
         total_points = 1
