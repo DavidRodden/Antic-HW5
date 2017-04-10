@@ -89,47 +89,52 @@ class AIPlayer(Player):
         else:
             input_list[1] = BAD
 
-        # <<---CODE BELOW HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
-
-        # Worker movement
+        # input_list[2]: If our workers are moving in a constructive manner
+        movement_points = 0
+        food_move = 100
         for ant in our_workers:
             ant_x = ant.coords[0]
             ant_y = ant.coords[1]
             for enemy in enemy_inv.ants:
                 if ((abs(ant_x - enemy.coords[0]) > 3) and
                         (abs(ant_y - enemy.coords[1]) > 3)):
-                    good_points += 60
-                    total_points += 60
+                    movement_points += 60
             if ant.carrying and ant not in dropping_off:
                 # Good if carrying ants move toward a drop off.
-                total_points += food_move
-                good_points += food_move
+                movement_points += food_move
 
                 for dist in range(2, 4):
                     for dropoff in food_drop_offs:
                         if ((abs(ant_x - dropoff[0]) < dist) and
                                 (abs(ant_y - dropoff[1]) < dist)):
-                            good_points += food_move - (dist * 25)
-                            total_points += food_move - (dist * 25)
-
-        # Raw ant numbers comparison
-        total_points += (len(our_inv.ants) + len(enemy_inv.ants)) * 10
-        good_points += len(our_inv.ants) * 10
-
-        # Weighted ant types
-        # Workers, first 3 are worth 10, the rest are penalized
-        enemy_workers = [ant for ant in enemy_inv.ants if ant.type == c.WORKER]
-        if len(our_workers) <= 3:
-            total_points += len(our_workers) * 10
-            good_points += len(our_workers) * 10
+                            movement_points += food_move - (dist * 25)
+        if movement_points >= 160: #testing for now, can be changed upwards
+            input_list[2] = GOOD
         else:
-            return 0.001
-        total_points += len(enemy_workers) * 50
+            input_list[2] = BAD
 
-        # prefer workers to not leave home range
+
+        # input_list[3]: if we have an equal or greater amount of ants
+        if len(our_inv.ants) >= len(enemy_inv.ants)):
+            input_list[3] = GOOD
+        else:
+            input_list[3] = BAD
+
+        # input_list[4]: make sure we don't have too many workers
+        enemy_workers = [ant for ant in enemy_inv.ants if ant.type == c.WORKER]
+        if len(our_workers) < 3:
+            input_list[4] = GOOD
+        else:
+            input_list[4] = BAD
+
+        # input_list[5]: make sure workers don't leave friendly half of board
         our_range = [(x, y) for x in xrange(10) for y in xrange(5)]
         if len([ant for ant in our_workers if ant.coords not in our_range]) != 0:
-            return .001
+            input_list[5] = BAD
+        else:
+            input_list[5] = GOOD
+
+# <<---CODE BELOW HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
 
         # Offensive ants
         # Let's just say each ant is worth 20x its cost for now
