@@ -48,7 +48,7 @@ class AIPlayer(Player):
 
     def map_input(state):
 
-        input_list = [] * 20;  # init list to be rtn'd at a <--CURRENTLY ARBITRARY--> value of 20
+        input_list = [] * 20  # init list to be rtn'd at a <--CURRENTLY ARBITRARY--> value of 20
 
         enemy_id = abs(state.whoseTurn - 1)
         our_inv = utils.getCurrPlayerInventory(state)
@@ -134,79 +134,78 @@ class AIPlayer(Player):
         else:
             input_list[5] = GOOD
 
-        # <<---CODE BELOW HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
+            # <<---CODE BELOW HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
 
-        # Offensive ants
-        # Let's just say each ant is worth 20x its cost for now
-        offensive = [c.SOLDIER, c.R_SOLDIER, c.DRONE]
-        our_offense = [ant for ant in our_inv.ants if ant.type in offensive]
-        enemy_offense = [
-            ant
-            for ant in enemy_inv.ants if ant.type in offensive]
+            # Offensive ants
+            # Let's just say each ant is worth 20x its cost for now
+            offensive = [c.SOLDIER, c.R_SOLDIER, c.DRONE]
+            our_offense = [ant for ant in our_inv.ants if ant.type in offensive]
+            enemy_offense = [
+                ant for ant in enemy_inv.ants if ant.type in offensive]
 
-        for ant in our_offense:
-            ant_x = ant.coords[0]
-        ant_y = ant.coords[1]
-        attack_move = 160
-        good_points = UNIT_STATS[ant.type][c.COST] * 20
-        total_points = UNIT_STATS[ant.type][c.COST] * 20
-        # good if on enemy anthill
-        if ant.coords == enemy_anthill.coords:
-            total_points += 100
-        good_points += 100
-        for enemy_ant in enemy_inv.ants:
-            enemy_x = enemy_ant.coords[0]
-        enemy_y = enemy_ant.coords[1]
-        x_dist = abs(ant_x - enemy_x)
-        y_dist = abs(ant_y - enemy_y)
+            for ant in our_offense:
+                ant_x = ant.coords[0]
+                ant_y = ant.coords[1]
+                attack_move = 160
+                good_points += UNIT_STATS[ant.type][c.COST] * 20
+                total_points += UNIT_STATS[ant.type][c.COST] * 20
+                # good if on enemy anthill
+                if ant.coords == enemy_anthill.coords:
+                    total_points += 100
+                    good_points += 100
+                for enemy_ant in enemy_inv.ants:
+                    enemy_x = enemy_ant.coords[0]
+                    enemy_y = enemy_ant.coords[1]
+                    x_dist = abs(ant_x - enemy_x)
+                    y_dist = abs(ant_y - enemy_y)
 
-        # good if attacker ant attacks
-        if x_dist + y_dist == 1:
-            good_points += attack_move * 2
-        total_points += attack_move * 2
+                    # good if attacker ant attacks
+                    if x_dist + y_dist == 1:
+                        good_points += attack_move * 2
+                        total_points += attack_move * 2
 
-        # weighted more if closer to attacking
-        for dist in xrange(1, 8):
-            if x_dist < dist and y_dist < dist:
-                good_points += attack_move - (dist * 20)
-                total_points += attack_move - (dist * 20)
+                    # weighted more if closer to attacking
+                    for dist in xrange(1, 8):
+                        if x_dist < dist and y_dist < dist:
+                            good_points += attack_move - (dist * 20)
+                            total_points += attack_move - (dist * 20)
 
-        for ant in enemy_offense:
-            total_points += UNIT_STATS[ant.type][c.COST] * 60
+            for ant in enemy_offense:
+                total_points += UNIT_STATS[ant.type][c.COST] * 60
 
-        # Stop building if we have more than 5 ants
-        if len(our_inv.ants) > 5:
-            total_points += 300
+            # Stop building if we have more than 5 ants
+            if len(our_inv.ants) > 5:
+                total_points += 300
 
-        # Queen stuff
-        # Queen healths, big deal, each HP is worth 100!
-        total_points += (our_queen.health + enemy_queen.health) * 100
-        good_points += our_queen.health * 100
-        queen_coords = our_queen.coords
-        if queen_coords in food_drop_offs or queen_coords[1] > 2:
-            # Stay off food_drop_offs and away from the front lines.
-            # return .001
-            total_points += 300
+            # Queen stuff
+            # Queen healths, big deal, each HP is worth 100!
+            total_points += (our_queen.health + enemy_queen.health) * 100
+            good_points += our_queen.health * 100
+            queen_coords = our_queen.coords
+            if queen_coords in food_drop_offs or queen_coords[1] > 2:
+                # Stay off food_drop_offs and away from the front lines.
+                # return .001
+                total_points += 300
 
-        # queen attacks if under threat
-        for enemy_ant in enemy_inv.ants:
-            enemy_x = enemy_ant.coords[0]
-        enemy_y = enemy_ant.coords[1]
-        x_dist = abs(queen_coords[0] - enemy_x)
-        y_dist = abs(queen_coords[1] - enemy_y)
+            # queen attacks if under threat
+            for enemy_ant in enemy_inv.ants:
+                enemy_x = enemy_ant.coords[0]
+                enemy_y = enemy_ant.coords[1]
+                x_dist = abs(queen_coords[0] - enemy_x)
+                y_dist = abs(queen_coords[1] - enemy_y)
 
-        if (x_dist + y_dist) == 1:
-            good_points += 200
-        total_points += 200
+                if (x_dist + y_dist) == 1:
+                    good_points += 200
+                    total_points += 200
 
-        # Anthill stuff
-        total_points += (our_anthill.captureHealth +
-                         enemy_anthill.captureHealth) * 200
-        good_points += our_anthill.captureHealth * 200
+            # Anthill stuff
+            total_points += (our_anthill.captureHealth +
+                             enemy_anthill.captureHealth) * 200
+            good_points += our_anthill.captureHealth * 200
 
-        # <<---CODE ABOVE HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
+            return 0  # output for mapping
 
-        return []  # return a list of inputs from the mapping function
+            # <<---CODE ABOVE HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
 
 
 @staticmethod
