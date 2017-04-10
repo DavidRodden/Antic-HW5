@@ -148,30 +148,17 @@ class AIPlayer(Player):
                 for dist in xrange(1, 8):
                     if x_dist < dist and y_dist < dist:
                         offense_points += attack_move - (dist * 20)  # 160 - (3 * 20) = 100 ~580
-        if offense_points >= 290:
-            input_list[6] = GOOD
-        else:
-            input_list[6] = BAD
+        input_list.append(GOOD if offense_points >= 290 else BAD)
 
         # Stop building if we have more than 5 ants
-        if len(our_inv.ants) > 5:
-            input_list[7] = BAD
-        else:
-            input_list[7] = GOOD
+        input_list.append(BAD if our_inv.ants > 5 else GOOD)
 
         # input_list[8]: Queen healths, big deal, it's being attacked it's bad
-        if our_queen.health < 8:  # UNIT_STATS[QUEEN][c.HEALTH]
-            input_list[8] = BAD
-        else:
-            input_list[8] = GOOD
+        input_list.append(BAD if our_queen.health < 8 else GOOD)
 
         # input_list[9]: Stay off food_drop_offs and away from the front lines
         queen_coords = our_queen.coords
-        if queen_coords in food_drop_offs or queen_coords[1] > 2:
-
-            input_list[9] = BAD
-        else:
-            input_list[9] = GOOD
+        input_list.append(BAD if queen_coords in food_drop_offs or queen_coords[1] > 2 else GOOD)
 
         # input_list[10]: queen attacks if under threat
         attack_points = 0
@@ -184,16 +171,10 @@ class AIPlayer(Player):
             if (x_dist + y_dist) == 1:
                 attack_points += 200
 
-        if attack_points >= 200:
-            input_list[10] = GOOD
-        else:
-            input_list[10] = BAD
+        input_list.append(GOOD if attack_points >= 200 else BAD)
 
         # Anthill stuff
-        if our_anthill.captureHealth < 3:
-            input_list[11] = BAD
-        else:
-            input_list[11] = GOOD
+        input_list.append(BAD if our_anthill.captureHealth < 3 else GOOD)
 
         return input_list  # returns the list we created
 
