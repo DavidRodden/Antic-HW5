@@ -74,9 +74,8 @@ class AIPlayer(Player):
         # input_list[0]: If our number of food is good or bad
         # Downside: incentivises AI to not spend food until it has
         #           1 over however many it takes to make an ant
-        if food_difference > 0:
-            input_list[0] = GOOD
 
+        input_list.append(GOOD if food_difference > 0 else BAD)
         # input_list[1]: If our workers are carrying or depositing food it's good
         our_workers = [ant for ant in our_inv.ants if ant.type == c.WORKER]
 
@@ -85,12 +84,7 @@ class AIPlayer(Player):
         dropping_off = [
             ant for ant in our_workers if ant.coords in food_drop_offs and ant.carrying]
 
-        if len(dropping_off) != 0:
-            input_list[1] = GOOD
-        elif len(carrying_workers) != 0:
-            input_list[1] = GOOD
-        else:
-            input_list[1] = BAD
+        input_list.append(GOOD if len(dropping_off) != 0 or len(carrying_workers) != 0 else BAD)
 
         # input_list[2]: If our workers are moving in a constructive manner
         movement_points = 0
@@ -111,30 +105,18 @@ class AIPlayer(Player):
                         if ((abs(ant_x - dropoff[0]) < dist) and
                                 (abs(ant_y - dropoff[1]) < dist)):
                             movement_points += food_move - (dist * 25)
-        if movement_points >= 160:  # testing for now, can be changed upwards
-            input_list[2] = GOOD
-        else:
-            input_list[2] = BAD
+        input_list.append(GOOD if movement_points >= 160 else BAD)  # testing for now, can be changed upwards
 
         # input_list[3]: if we have an equal or greater amount of ants
-        if len(our_inv.ants) >= len(enemy_inv.ants):
-            input_list[3] = GOOD
-        else:
-            input_list[3] = BAD
+        input_list.append(GOOD if len(our_inv.ants) >= len(enemy_inv.ants) else BAD)
 
         # input_list[4]: make sure we don't have too many workers
         enemy_workers = [ant for ant in enemy_inv.ants if ant.type == c.WORKER]
-        if len(our_workers) < 3:
-            input_list[4] = GOOD
-        else:
-            input_list[4] = BAD
+        input_list.append(GOOD if len(our_workers) < 3 else BAD)
 
         # input_list[5]: make sure workers don't leave friendly half of board
         our_range = [(x, y) for x in xrange(10) for y in xrange(5)]
-        if len([ant for ant in our_workers if ant.coords not in our_range]) != 0:
-            input_list[5] = BAD
-        else:
-            input_list[5] = GOOD
+        input_list.append(BAD if len([ant for ant in our_workers if ant.coords not in our_range]) != 0 else GOOD)
 
         # input_list[6]: make sure offensive ants are offensive
         # Let's just say each ant is worth 20x its cost for now
@@ -399,7 +381,6 @@ class AIPlayer(Player):
 
         return float(good_points) / float(total_points)
 
-
     def evaluate_nodes(self, nodes):
         """Evalute a list of Nodes and returns the correct minmaxed score.
         That is, when it is our turn, return the max, when it is not, return
@@ -412,7 +393,6 @@ class AIPlayer(Player):
             # print "Min: {}, Max: {}".format(min(nodes, key=lambda node:
             # node.score).score, max(nodes, key=lambda node: node.score).score)
             return min(nodes, key=lambda node: node.score)
-
 
     def get_best_move(self, curr_state, depth_limit, moves=None):
         """
@@ -461,7 +441,6 @@ class AIPlayer(Player):
             return Move(c.END, None, None)
 
         return best_node.move
-
 
     def analyze_subnodes(self, curr_state, depth_limit, root, nodes=None):
         """
@@ -564,7 +543,6 @@ class AIPlayer(Player):
         # print "Examining " + str(len(nodes)) + " nodes"
         return self.evaluate_nodes(nodes)
 
-
     def getPlacement(self, currentState):
         """
         getPlacement:
@@ -631,7 +609,6 @@ class AIPlayer(Player):
         else:
             return [(0, 0)]
 
-
     def getMove(self, currentState):
         """
         Description:
@@ -650,7 +627,6 @@ class AIPlayer(Player):
         move = self.get_best_move(currentState, depth)
 
         return move
-
 
     def getAttack(self, currentState, attackingAnt, enemyLocations):
         """
