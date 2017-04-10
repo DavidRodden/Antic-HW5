@@ -205,16 +205,14 @@ class AIPlayer(Player):
         else:
             input_list[10] = BAD
 
-# <<---CODE BELOW HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
-
         # Anthill stuff
-        total_points += (our_anthill.captureHealth +
-                         enemy_anthill.captureHealth) * 200
-        good_points += our_anthill.captureHealth * 200
+        if our_anthill.captureHealth < 3:
+            input_list[11] = BAD
+        else:
+            input_list[11] = GOOD
 
-        return 0  # output for mapping
+        return input_list  # returns the list we created
 
-        # <<---CODE ABOVE HERE IS COPIED FROM THE score_state F'N AND NEEDS TO BE UPDATED FOR HW5--->>
 
 
 @staticmethod
