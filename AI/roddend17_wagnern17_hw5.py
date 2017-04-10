@@ -154,22 +154,25 @@ class AIPlayer(Player):
         input_list.append(BAD if our_inv.ants > 5 else GOOD)
 
         # input_list[8]: Queen healths, big deal, it's being attacked it's bad
-        input_list.append(BAD if our_queen.health < 8 else GOOD)
+        input_list.append(BAD if our_queen is not None and our_queen.health < 8 else GOOD)
 
         # input_list[9]: Stay off food_drop_offs and away from the front lines
-        queen_coords = our_queen.coords
-        input_list.append(BAD if queen_coords in food_drop_offs or queen_coords[1] > 2 else GOOD)
 
-        # input_list[10]: queen attacks if under threat
         attack_points = 0
-        for enemy_ant in enemy_inv.ants:
-            enemy_x = enemy_ant.coords[0]
-            enemy_y = enemy_ant.coords[1]
-            x_dist = abs(queen_coords[0] - enemy_x)
-            y_dist = abs(queen_coords[1] - enemy_y)
 
-            if (x_dist + y_dist) == 1:
-                attack_points += 200
+        if our_queen is not None:
+            queen_coords = our_queen.coords
+            input_list.append(BAD if queen_coords in food_drop_offs or queen_coords[1] > 2 else GOOD)
+
+            # input_list[10]: queen attacks if under threat
+            for enemy_ant in enemy_inv.ants:
+                enemy_x = enemy_ant.coords[0]
+                enemy_y = enemy_ant.coords[1]
+                x_dist = abs(queen_coords[0] - enemy_x)
+                y_dist = abs(queen_coords[1] - enemy_y)
+
+                if (x_dist + y_dist) == 1:
+                    attack_points += 200
 
         input_list.append(GOOD if attack_points >= 200 else BAD)
 
@@ -548,7 +551,6 @@ class AIPlayer(Player):
                 If setup phase 2: list of two 2-tuples of ints ->
                     [(x1,y1), (x2,y2)]
         """
-        print "opq"
         numToPlace = 0
         # implemented by students to return their next move
         if currentState.phase == c.SETUP_PHASE_1:  # stuff on my side
