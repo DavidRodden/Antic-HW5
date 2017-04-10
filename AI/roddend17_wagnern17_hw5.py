@@ -150,7 +150,7 @@ class AIPlayer(Player):
                         offense_points += attack_move - (dist * 20)  # 160 - (3 * 20) = 100 ~580
         input_list.append(GOOD if offense_points >= 290 else BAD)
 
-        # Stop building if we have more than 5 ants
+        # input_list[7]: Stop building if we have more than 5 ants
         input_list.append(BAD if our_inv.ants > 5 else GOOD)
 
         # input_list[8]: Queen healths, big deal, it's being attacked it's bad
@@ -176,7 +176,7 @@ class AIPlayer(Player):
 
         input_list.append(GOOD if attack_points >= 200 else BAD)
 
-        # Anthill stuff
+        # input_list[11]: Anthill logic
         input_list.append(BAD if our_anthill.captureHealth < 3 else GOOD)
 
         return input_list  # returns the list we created
