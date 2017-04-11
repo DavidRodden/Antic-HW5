@@ -53,6 +53,9 @@ class AIPlayer(Player):
             self.bias_weights[i] += 0.8 * current_perc_delta
             perc_delta.append(current_perc_delta)
 
+        # first 12 can be iterated through as they are a mapping to itself
+        for i in range(0, len(self.input_values)):
+            self.input_weights[i] += 0.8 * perc_delta[i]
 
 
 
