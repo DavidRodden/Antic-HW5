@@ -37,6 +37,7 @@ class AIPlayer(Player):
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
         print "something happened"
+        print "extra"
 
 
     def back_propogation(self):
@@ -44,11 +45,17 @@ class AIPlayer(Player):
         actual = 0.5 # Get from neural net function
         error = target - actual
         delta = actual * (1 - actual) * error
+        perc_delta = []
         for i in range(0, len(self.output_weights)):
             perc_error = self.output_weights[i] * delta
-            perc_delta = self.hidden_ouput[i] * (1 - self.hidden_output[i]) * perc_error
-            self.output_weights[i] += 0.8 * delta * self.current_node_output
-            self.bias_weights[i] += 0.8 * perc_delta
+            current_perc_delta = self.hidden_ouput[i] * (1 - self.hidden_output[i]) * perc_error
+            self.output_weights[i] += 0.8 * delta * self.hidden_node_output[i]
+            self.bias_weights[i] += 0.8 * current_perc_delta
+            perc_delta.append(current_perc_delta)
+
+
+
+
 
         pass
 
