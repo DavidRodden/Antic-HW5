@@ -57,21 +57,20 @@ class AIPlayer(Player):
         for i in range(0, len(input_values)):
             self.initial_weights[i] += 0.8 * perc_delta[i] * input_values[i]
 
-        self.initial_weights[12] += 0.8 * perc_delta[0] * input_values[12]
-        self.initial_weights[13] += 0.8 * perc_delta[1] * input_values[12]
-        self.initial_weights[14] += 0.8 * perc_delta[1] * input_values[13]
-        self.initial_weights[15] += 0.8 * perc_delta[2] * input_values[13]
-        self.initial_weights[16] += 0.8 * perc_delta[4] * input_values[13]
-        self.initial_weights[17] += 0.8 * perc_delta[5] * input_values[13]
-        self.initial_weights[18] += 0.8 * perc_delta[3] * input_values[14]
-        self.initial_weights[19] += 0.8 * perc_delta[4] * input_values[14]
-        self.initial_weights[20] += 0.8 * perc_delta[7] * input_values[14]
-        self.initial_weights[21] += 0.8 * perc_delta[8] * input_values[15]
-        self.initial_weights[22] += 0.8 * perc_delta[9] * input_values[15]
-        self.initial_weights[23] += 0.8 * perc_delta[10] * input_values[15]
-        self.initial_weights[24] += 0.8 * perc_delta[0] * input_values[16]
-        self.initial_weights[25] += 0.8 * perc_delta[3] * input_values[16]
-        print self.initial_weights
+        self.initial_weights[12] += 0.8 * input_values[0] * perc_delta[12]
+        self.initial_weights[13] += 0.8 * input_values[1] * perc_delta[12]
+        self.initial_weights[14] += 0.8 * input_values[1] * perc_delta[13]
+        self.initial_weights[15] += 0.8 * input_values[2] * perc_delta[13]
+        self.initial_weights[16] += 0.8 * input_values[4] * perc_delta[13]
+        self.initial_weights[17] += 0.8 * input_values[5] * perc_delta[13]
+        self.initial_weights[18] += 0.8 * input_values[3] * perc_delta[14]
+        self.initial_weights[19] += 0.8 * input_values[4] * perc_delta[14]
+        self.initial_weights[20] += 0.8 * input_values[7] * perc_delta[14]
+        self.initial_weights[21] += 0.8 * input_values[8] * perc_delta[15]
+        self.initial_weights[22] += 0.8 * input_values[9] * perc_delta[15]
+        self.initial_weights[23] += 0.8 * input_values[10] * perc_delta[15]
+        self.initial_weights[24] += 0.8 * input_values[0] * perc_delta[16]
+        self.initial_weights[25] += 0.8 * input_values[3] * perc_delta[16]
         return None
 
     def neural_net(self, input_list):
@@ -114,9 +113,8 @@ class AIPlayer(Player):
             if (output_vals[i] >= threshold):
                 output += output_vals[i]
 
-        print(output)
-
-        return (output_vals, output)
+        print output
+        return output_vals, output
 
     """
     Description:
