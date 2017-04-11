@@ -36,9 +36,43 @@ class AIPlayer(Player):
             inputPlayerId - The id to give the new player (int)
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
-        self.initialWeights = [0.5] * 26
-        self.outputWeights = [0.5] * 17
-        self.perceptronBiasWeights = [0.5] * 17
+        self.initial_weights = [0.5] * 26
+        self.output_weights = [0.5] * 17
+        self.bias_weights = [0.5] * 17
+
+    # input_values: output of mapping f'n
+    # hidden_output: zeroeth output of neural net f'n
+    def back_propogation(self, input_values, hidden_output, target, actual):
+        error = target - actual
+        delta = actual * (1 - actual) * error
+        perc_delta = []
+        for i in range(0, len(self.output_weights)):
+            perc_error = self.output_weights[i] * delta
+            current_perc_delta = hidden_output[i] * (1 - hidden_output[i]) * perc_error
+            self.output_weights[i] += 0.8 * delta * hidden_output[i]
+            self.bias_weights[i] += 0.8 * current_perc_delta
+            perc_delta.append(current_perc_delta)
+
+        # first 12 can be iterated through as they are a mapping to itself
+        for i in range(0, len(input_values)):
+            self.initial_weights[i] += 0.8 * perc_delta[i] * input_values[i]
+
+        self.initial_weights[12] += 0.8 * perc_delta[0] * input_values[12]
+        self.initial_weights[13] += 0.8 * perc_delta[1] * input_values[12]
+        self.initial_weights[14] += 0.8 * perc_delta[1] * input_values[13]
+        self.initial_weights[15] += 0.8 * perc_delta[2] * input_values[13]
+        self.initial_weights[16] += 0.8 * perc_delta[4] * input_values[13]
+        self.initial_weights[17] += 0.8 * perc_delta[5] * input_values[13]
+        self.initial_weights[18] += 0.8 * perc_delta[3] * input_values[14]
+        self.initial_weights[19] += 0.8 * perc_delta[4] * input_values[14]
+        self.initial_weights[20] += 0.8 * perc_delta[7] * input_values[14]
+        self.initial_weights[21] += 0.8 * perc_delta[8] * input_values[15]
+        self.initial_weights[22] += 0.8 * perc_delta[9] * input_values[15]
+        self.initial_weights[23] += 0.8 * perc_delta[10] * input_values[15]
+        self.initial_weights[24] += 0.8 * perc_delta[0] * input_values[16]
+        self.initial_weights[25] += 0.8 * perc_delta[3] * input_values[16]
+        print self.initial_weights
+        return None
 
     def neural_net(self, input_list):
         perceptron_vals = [0.0] * 17 #values that go into the threshold f'n
@@ -76,7 +110,6 @@ class AIPlayer(Player):
         print(output)
 
         return (output_vals, output)
-
 
     """
     Description:
@@ -435,9 +468,7 @@ class AIPlayer(Player):
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
 
-        temp_list = [] * 12
-        temp_list = AIPlayer.map_input(state)
-        my_tuple = self.neural_net(temp_list)
+        self.back_propogation([.5] * 17, [.5] * 17, 1, .5)
 
         # If we get a list of moves, just get rid of the END move(s)
         if moves is None:
