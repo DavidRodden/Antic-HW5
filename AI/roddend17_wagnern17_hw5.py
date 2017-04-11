@@ -38,7 +38,7 @@ class AIPlayer(Player):
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
         self.initialWeights = [0.5] * 26
         self.outputWeights = [0.5] * 17
-        self.perceptronBias = [0.5] * 17
+        self.perceptronBiasWeights = [0.5] * 17
 
     def neural_net(self, input_list):
         perceptron_list = [0] * 17
@@ -46,16 +46,16 @@ class AIPlayer(Player):
         
         # init perceptron values
         for x in range(0, len(input_list)):
-            perceptron_list[x] = self.initialWeights[x]*input_list[x]
+            perceptron_list[x] = self.initialWeights[x]*input_list[x] + self.perceptronBiasWeights[x]
 
-        perceptron_list[12] = self.initialWeights[0]*input_list[0] + self.initialWeights[1]*input_list[1] #uses inputs 0 and 1
-        perceptron_list[13] = self.initialWeights[1]*input_list[1] + self.initialWeights[2]*input_list[2] + self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4] #uses input 1,2,3,4
-        perceptron_list[14] = self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4] + self.initialWeights[7]*input_list[7] #uses inputs 3,4,7
-        perceptron_list[15] = self.initialWeights[8]*input_list[8] + self.initialWeights[9]*input_list[9] + self.initialWeights[10]*input_list[10] #uses inputs 8,9,10
-        perceptron_list[16] = self.initialWeights[0]*input_list[0] + self.initialWeights[3]*input_list[3] #uses inputs 0 and 3
+        perceptron_list[12] = self.initialWeights[0]*input_list[0] + self.initialWeights[1]*input_list[1] + self.perceptronBiasWeights[12]#uses inputs 0 and 1
+        perceptron_list[13] = self.initialWeights[1]*input_list[1] + self.initialWeights[2]*input_list[2] + self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4] + self.perceptronBiasWeights[13] #uses input 1,2,3,4
+        perceptron_list[14] = self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4] + self.initialWeights[7]*input_list[7] + self.perceptronBiasWeights[14] #uses inputs 3,4,7
+        perceptron_list[15] = self.initialWeights[8]*input_list[8] + self.initialWeights[9]*input_list[9] + self.initialWeights[10]*input_list[10] + self.perceptronBiasWeights[15] #uses inputs 8,9,10
+        perceptron_list[16] = self.initialWeights[0]*input_list[0] + self.initialWeights[3]*input_list[3] + self.perceptronBiasWeights[16] #uses inputs 0 and 3
 
         # do threshold calcs
-        
+
 
 
         return 0
