@@ -50,7 +50,7 @@ class AIPlayer(Player):
         for i in range(0, len(self.output_weights)):
             perc_error = self.output_weights[i] * delta
             current_perc_delta = self.hidden_ouput[i] * (1 - self.hidden_output[i]) * perc_error
-            self.output_weights[i] += 0.8 * delta * self.hidden_node_output[i]
+            self.output_weights[i] += 0.8 * delta * self.hidden_output[i]
             self.bias_weights[i] += 0.8 * current_perc_delta
             perc_delta.append(current_perc_delta)
 
