@@ -36,8 +36,9 @@ class AIPlayer(Player):
             inputPlayerId - The id to give the new player (int)
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
-        print "something happened"
-        print "extra"
+        self.initial_weights = [0.5] * 26
+        self.output_weights = [0.5] * 17
+        self.bias_weights = [0.5] * 17
 
 
     def back_propogation(self):
