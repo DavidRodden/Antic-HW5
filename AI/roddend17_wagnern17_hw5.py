@@ -40,30 +40,25 @@ class AIPlayer(Player):
         self.outputWeights = [0.5] * 17
         self.perceptronBias = [0.5] * 17
 
-<<<<<<< HEAD
-    def neural_net(input_list):
+    def neural_net(self, input_list):
         perceptron_list = [0] * 17
         threshold = 1.5
         
-        for x in range(0,11):
+        # init perceptron values
+        for x in range(0, len(input_list)):
             perceptron_list[x] = self.initialWeights[x]*input_list[x]
 
-        perceptron_list[12] = self.initialWeights[0]*input_list[0] + self.initialWeights[1]*input_list[1]
-        perceptron_list[13] = self.initialWeights[1]*input_list[1] + self.initialWeights[2]*input_list[2] + self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4]
-        perceptron_list[14] = self.initialWeights[x]*input_list[x]
-        perceptron_list[15] = self.initialWeights[x]*input_list[x]
-        perceptron_list[16] = self.initialWeights[x]*input_list[x]
+        perceptron_list[12] = self.initialWeights[0]*input_list[0] + self.initialWeights[1]*input_list[1] #uses inputs 0 and 1
+        perceptron_list[13] = self.initialWeights[1]*input_list[1] + self.initialWeights[2]*input_list[2] + self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4] #uses input 1,2,3,4
+        perceptron_list[14] = self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4] + self.initialWeights[7]*input_list[7] #uses inputs 3,4,7
+        perceptron_list[15] = self.initialWeights[8]*input_list[8] + self.initialWeights[9]*input_list[9] + self.initialWeights[10]*input_list[10] #uses inputs 8,9,10
+        perceptron_list[16] = self.initialWeights[0]*input_list[0] + self.initialWeights[3]*input_list[3] #uses inputs 0 and 3
 
-=======
-    def neural_net(self, input_list):
-        threshold = 1.5
-        input_percepetrons = [0] * 17
-        for i in xrange(0, len(input_list)):
-            input_percepetrons[i] = self.initialWeights[i] * input_list[i]
+        # do threshold calcs
+        
 
 
         return 0
->>>>>>> 5ef881d23aae1046e56a662f45315f767a604704
 
 
     """
