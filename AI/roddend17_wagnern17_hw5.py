@@ -40,10 +40,19 @@ class AIPlayer(Player):
         self.outputWeights = [0.5] * 17
         self.perceptronBias = [0.5] * 17
 
-    @staticmethod
     def neural_net(input_list):
+        perceptron_list = [0] * 17
         threshold = 1.5
-        self.initialWeights[0]*input_list[0]
+        
+        for x in range(0,11):
+            perceptron_list[x] = self.initialWeights[x]*input_list[x]
+
+        perceptron_list[12] = self.initialWeights[0]*input_list[0] + self.initialWeights[1]*input_list[1]
+        perceptron_list[13] = self.initialWeights[1]*input_list[1] + self.initialWeights[2]*input_list[2] + self.initialWeights[3]*input_list[3] + self.initialWeights[4]*input_list[4]
+        perceptron_list[14] = self.initialWeights[x]*input_list[x]
+        perceptron_list[15] = self.initialWeights[x]*input_list[x]
+        perceptron_list[16] = self.initialWeights[x]*input_list[x]
+
 
 
     """
