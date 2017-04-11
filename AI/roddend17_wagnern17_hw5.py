@@ -36,9 +36,9 @@ class AIPlayer(Player):
             inputPlayerId - The id to give the new player (int)
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
-        self.initial_weights = [0.5] * 26
-        self.output_weights = [0.5] * 17
-        self.bias_weights = [0.5] * 17
+        self.initial_weights = [0.15] * 26
+        self.output_weights = [0.15] * 17
+        self.bias_weights = [0.10] * 17
 
     # input_values: output of mapping f'n
     # hidden_output: zeroeth output of neural net f'n
@@ -73,47 +73,52 @@ class AIPlayer(Player):
         self.initial_weights[25] += 0.8 * input_values[3] * perc_delta[16]
         return None
 
-    def neural_net(self, input_list):
+    @staticmethod
+    def neural_net(input_list):
         perceptron_vals = [0.0] * 17  # values that go into the threshold f'n
         perceptron_outs = [0.0] * 17  # 0 or 1 that outputs from the threshold f'n
         output_vals = [0.0] * 17  # values that go into the output nodes threshold f'n
-        threshold = 1.5  # threshold value for the threshold f'n
+        threshold = .85  # threshold value for the threshold f'n
         output = 0.0  # we return this floating point value
+
+        initial_weights = [0.15] * 26
+        output_weights = [0.15] * 17
+        bias_weights = [0.10] * 17
 
         # init perceptron values
         for x in range(0, len(input_list)):
-            perceptron_vals[x] = self.initial_weights[x] * input_list[x] + self.bias_weights[x]
+            perceptron_vals[x] = initial_weights[x] * input_list[x] + bias_weights[x]
 
-        perceptron_vals[12] = self.initial_weights[12] * input_list[0] + self.initial_weights[13] * input_list[1] + \
-                              self.bias_weights[12]  # uses inputs 0 and 1
-        perceptron_vals[13] = self.initial_weights[14] * input_list[1] + self.initial_weights[15] * input_list[2] + \
-                              self.initial_weights[16] * input_list[3] + self.initial_weights[17] * input_list[4] + \
-                              self.bias_weights[13]  # uses input 1,2,3,4
-        perceptron_vals[14] = self.initial_weights[18] * input_list[3] + self.initial_weights[19] * input_list[4] + \
-                              self.initial_weights[20] * input_list[7] + self.bias_weights[
+        perceptron_vals[12] = initial_weights[12] * input_list[0] + initial_weights[13] * input_list[1] + \
+                              bias_weights[12]  # uses inputs 0 and 1
+        perceptron_vals[13] = initial_weights[14] * input_list[1] + initial_weights[15] * input_list[2] + \
+                              initial_weights[16] * input_list[3] + initial_weights[17] * input_list[4] + \
+                              bias_weights[13]  # uses input 1,2,3,4
+        perceptron_vals[14] = initial_weights[18] * input_list[3] + initial_weights[19] * input_list[4] + \
+                              initial_weights[20] * input_list[7] + bias_weights[
                                   14]  # uses inputs 3,4,7
-        perceptron_vals[15] = self.initial_weights[21] * input_list[8] + self.initial_weights[22] * input_list[9] + \
-                              self.initial_weights[23] * input_list[10] + self.bias_weights[
+        perceptron_vals[15] = initial_weights[21] * input_list[8] + initial_weights[22] * input_list[9] + \
+                              initial_weights[23] * input_list[10] + bias_weights[
                                   15]  # uses inputs 8,9,10
-        perceptron_vals[16] = self.initial_weights[24] * input_list[0] + self.initial_weights[25] * input_list[3] + \
-                              self.bias_weights[16]  # uses inputs 0 and 3
+        perceptron_vals[16] = initial_weights[24] * input_list[0] + initial_weights[25] * input_list[3] + \
+                              bias_weights[16]  # uses inputs 0 and 3
         # do threshold calcs and decide if perceptron outputs 0 or 1
         for y in range(0, len(perceptron_outs)):
-            if (perceptron_vals[y] >= threshold):
-                perceptron_outs[y] = perceptron_vals[y]
-            else:
-                perceptron_outs[y] = 0
+            #if (perceptron_vals[y] >= threshold):
+            perceptron_outs[y] = perceptron_vals[y]
+            #else:
+            #    perceptron_outs[y] = 0.0
 
         # init output values
         for z in range(0, len(output_vals)):
-            output_vals[z] = self.output_weights[z] * perceptron_outs[z]
+            output_vals[z] = output_weights[z] * perceptron_outs[z]
 
         # do the output calc and return the resulting output
         for i in range(0, len(output_vals)):
-            if (output_vals[i] >= threshold):
-                output += output_vals[i]
+            #if (output_vals[i] >= threshold):
+            output += output_vals[i]
 
-        print output
+        #print output
         return output_vals, output
 
     """
@@ -134,8 +139,8 @@ class AIPlayer(Player):
         our_inv = utils.getCurrPlayerInventory(state)
         enemy_inv = [
             inv for inv in state.inventories if inv.player == enemy_id].pop()
-        GOOD = 1
-        BAD = 0
+        GOOD = 1.0
+        BAD = 0.0
         we_win = 1.0
         enemy_win = 0.0
         our_food = our_inv.foodCount
@@ -150,9 +155,6 @@ class AIPlayer(Player):
         food_drop_offs.append(our_anthill.coords)
 
         # input_list[0]: If our number of food is good or bad
-        # Downside: incentivises AI to not spend food until it has
-        #           1 over however many it takes to make an ant
-
         input_list.append(GOOD if food_difference > 0 else BAD)
         # input_list[1]: If our workers are carrying or depositing food it's good
         our_workers = [ant for ant in our_inv.ants if ant.type == c.WORKER]
@@ -183,7 +185,7 @@ class AIPlayer(Player):
                         if ((abs(ant_x - dropoff[0]) < dist) and
                                 (abs(ant_y - dropoff[1]) < dist)):
                             movement_points += food_move - (dist * 25)
-        input_list.append(GOOD if movement_points >= 160 else BAD)  # testing for now, can be changed upwards
+        input_list.append(GOOD if movement_points >= 100 else BAD)  # testing for now, can be changed upwards
 
         # input_list[3]: if we have an equal or greater amount of ants
         input_list.append(GOOD if len(our_inv.ants) >= len(enemy_inv.ants) else BAD)
@@ -226,7 +228,7 @@ class AIPlayer(Player):
                 for dist in xrange(1, 8):
                     if x_dist < dist and y_dist < dist:
                         offense_points += attack_move - (dist * 20)  # 160 - (3 * 20) = 100 ~580
-        input_list.append(GOOD if offense_points >= 290 else BAD)
+        input_list.append(GOOD if offense_points >= 100 else BAD)
 
         # input_list[7]: Stop building if we have more than 5 ants
         input_list.append(BAD if our_inv.ants > 5 else GOOD)
@@ -471,12 +473,17 @@ class AIPlayer(Player):
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
 
-        temp_list = AIPlayer.map_input(curr_state)
-        my_tuple = self.neural_net(temp_list)
-        target_score = AIPlayer.score_state(curr_state)
-        self.back_propogation(temp_list, my_tuple[0], target_score, my_tuple[1])
 
-        self.back_propogation([.5] * 17, [.5] * 17, 1, .5)
+        #   ---CODE USED FOR TRAINING---
+        #temp_list = AIPlayer.map_input(curr_state)
+        #my_tuple = self.neural_net(temp_list)
+        #target_score = AIPlayer.score_state(curr_state)
+        #error = target_score - my_tuple[1]
+
+        #if error <= .05:
+        #print "error: " + str(error) + "  output: " + str(my_tuple[1])
+        #print "weights: " + str(self.initial_weights)
+        #self.back_propogation(temp_list, my_tuple[0], target_score, my_tuple[1])
 
         # If we get a list of moves, just get rid of the END move(s)
         if moves is None:
@@ -729,14 +736,18 @@ class Node(object):
         self.alpha = -10  # Negative inf.
         self.beta = 10  # Positive inf.
         if score is None:
-            self.score = AIPlayer.score_state(state)
+            temp_list = AIPlayer.map_input(self.state)
+            my_tuple = AIPlayer.neural_net(temp_list)
+            self.score = my_tuple[1]
         self.parent = parent
         if parent is not None:
             self.alpha = parent.alpha
             self.beta = parent.beta
 
     def calc_score(self):
-        self.score = AIPlayer.score_state(self.state)
+        temp_list = AIPlayer.map_input(self.state)
+        my_tuple = AIPlayer.neural_net(temp_list)
+        self.score = my_tuple[1]
 
     def whose_turn(self):
         return self.state.whoseTurn
