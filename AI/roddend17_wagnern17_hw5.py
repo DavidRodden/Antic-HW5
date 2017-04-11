@@ -48,7 +48,7 @@ class AIPlayer(Player):
             perc_error = self.output_weights[i] * delta
             perc_delta = self.hidden_ouput[i] * (1 - self.hidden_output[i]) * perc_error
             self.output_weights[i] += 0.8 * delta * self.current_node_output
-
+            self.bias_weights[i] += 0.8 * perc_delta
 
         pass
 
