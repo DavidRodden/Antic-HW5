@@ -40,6 +40,10 @@ class AIPlayer(Player):
 
 
     def back_propogation(self):
+        target = 1 # Get from fitness function
+        actual = 0.5 # Get from neural net function
+        error = target - actual
+        delta = actual * (1 - actual) * error
 
         pass
 
