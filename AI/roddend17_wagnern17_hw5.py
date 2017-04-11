@@ -41,7 +41,7 @@ class AIPlayer(Player):
         self.bias_weights = [0.5] * 17
 
 
-    def back_propogation(self):
+    def back_propogation(self, input_values):
         target = 1 # Get from fitness function
         actual = 0.5 # Get from neural net function
         error = target - actual
@@ -56,22 +56,22 @@ class AIPlayer(Player):
 
         # first 12 can be iterated through as they are a mapping to itself
         for i in range(0, len(self.input_values)):
-            self.input_weights[i] += 0.8 * perc_delta[i] * self.input_values[i]
+            self.initial_weights[i] += 0.8 * perc_delta[i] * self.input_values[i]
 
-        self.input_weights[12] += 0.8 * perc_delta[0] * self.input_values[12]
-        self.input_weights[13] += 0.8 * perc_delta[1] * self.input_values[12]
-        self.input_weights[14] += 0.8 * perc_delta[1] * self.input_values[13]
-        self.input_weights[15] += 0.8 * perc_delta[2] * self.input_values[13]
-        self.input_weights[16] += 0.8 * perc_delta[4] * self.input_values[13]
-        self.input_weights[17] += 0.8 * perc_delta[5] * self.input_values[13]
-        self.input_weights[18] += 0.8 * perc_delta[3] * self.input_values[14]
-        self.input_weights[19] += 0.8 * perc_delta[4] * self.input_values[14]
-        self.input_weights[20] += 0.8 * perc_delta[7] * self.input_values[14]
-        self.input_weights[21] += 0.8 * perc_delta[8] * self.input_values[15]
-        self.input_weights[22] += 0.8 * perc_delta[9] * self.input_values[15]
-        self.input_weights[23] += 0.8 * perc_delta[10] * self.input_values[15]
-        self.input_weights[24] += 0.8 * perc_delta[0] * self.input_values[16]
-        self.input_weights[25] += 0.8 * perc_delta[3] * self.input_values[16]
+        self.initial_weights[12] += 0.8 * perc_delta[0] * self.input_values[12]
+        self.initial_weights[13] += 0.8 * perc_delta[1] * self.input_values[12]
+        self.initial_weights[14] += 0.8 * perc_delta[1] * self.input_values[13]
+        self.initial_weights[15] += 0.8 * perc_delta[2] * self.input_values[13]
+        self.initial_weights[16] += 0.8 * perc_delta[4] * self.input_values[13]
+        self.initial_weights[17] += 0.8 * perc_delta[5] * self.input_values[13]
+        self.initial_weights[18] += 0.8 * perc_delta[3] * self.input_values[14]
+        self.initial_weights[19] += 0.8 * perc_delta[4] * self.input_values[14]
+        self.initial_weights[20] += 0.8 * perc_delta[7] * self.input_values[14]
+        self.initial_weights[21] += 0.8 * perc_delta[8] * self.input_values[15]
+        self.initial_weights[22] += 0.8 * perc_delta[9] * self.input_values[15]
+        self.initial_weights[23] += 0.8 * perc_delta[10] * self.input_values[15]
+        self.initial_weights[24] += 0.8 * perc_delta[0] * self.input_values[16]
+        self.initial_weights[25] += 0.8 * perc_delta[3] * self.input_values[16]
         return None
 
     """
