@@ -73,7 +73,9 @@ class AIPlayer(Player):
             if (output_vals[i] >= threshold):
                 output += output_vals[i]
 
-        return output
+        print(output)
+
+        return (output_vals, output)
 
 
     """
@@ -252,9 +254,7 @@ class AIPlayer(Player):
         food_drop_offs = [our_tunnel.coords]
         food_drop_offs.append(our_anthill.coords)
 
-        temp_list = [] * 12
-        temp_list = AIPlayer.map_input(state)
-        neural_net(temp_list)
+
 
         # Total points possible
         total_points = 1
@@ -434,6 +434,10 @@ class AIPlayer(Player):
         """
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
+
+        temp_list = [] * 12
+        temp_list = AIPlayer.map_input(state)
+        my_tuple = self.neural_net(temp_list)
 
         # If we get a list of moves, just get rid of the END move(s)
         if moves is None:
