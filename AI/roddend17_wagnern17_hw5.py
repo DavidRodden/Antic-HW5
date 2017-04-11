@@ -75,21 +75,29 @@ class AIPlayer(Player):
         return None
 
     def neural_net(self, input_list):
-        perceptron_vals = [0.0] * 17 #values that go into the threshold f'n
-        perceptron_outs = [0.0] * 17 #0 or 1 that outputs from the threshold f'n
-        output_vals = [0.0] *17 #values that go into the output nodes threshold f'n
-        threshold = 1.5 # threshold value for the threshold f'n
-        output = 0.0 #we return this floating point value
+        perceptron_vals = [0.0] * 17  # values that go into the threshold f'n
+        perceptron_outs = [0.0] * 17  # 0 or 1 that outputs from the threshold f'n
+        output_vals = [0.0] * 17  # values that go into the output nodes threshold f'n
+        threshold = 1.5  # threshold value for the threshold f'n
+        output = 0.0  # we return this floating point value
 
         # init perceptron values
         for x in range(0, len(input_list)):
-            perceptron_vals[x] = self.initialWeights[x]*input_list[x] + self.perceptronBiasWeights[x]
+            perceptron_vals[x] = self.initial_weights[x] * input_list[x] + self.bias_weights[x]
 
-        perceptron_vals[12] = self.initialWeights[12]*input_list[0] + self.initialWeights[13]*input_list[1] + self.perceptronBiasWeights[12]#uses inputs 0 and 1
-        perceptron_vals[13] = self.initialWeights[14]*input_list[1] + self.initialWeights[15]*input_list[2] + self.initialWeights[16]*input_list[3] + self.initialWeights[17]*input_list[4] + self.perceptronBiasWeights[13] #uses input 1,2,3,4
-        perceptron_vals[14] = self.initialWeights[18]*input_list[3] + self.initialWeights[19]*input_list[4] + self.initialWeights[20]*input_list[7] + self.perceptronBiasWeights[14] #uses inputs 3,4,7
-        perceptron_vals[15] = self.initialWeights[21]*input_list[8] + self.initialWeights[22]*input_list[9] + self.initialWeights[23]*input_list[10] + self.perceptronBiasWeights[15] #uses inputs 8,9,10
-        perceptron_vals[16] = self.initialWeights[24]*input_list[0] + self.initialWeights[25]*input_list[3] + self.perceptronBiasWeights[16] #uses inputs 0 and 3
+        perceptron_vals[12] = self.initial_weights[12] * input_list[0] + self.initial_weights[13] * input_list[1] + \
+                              self.bias_weights[12]  # uses inputs 0 and 1
+        perceptron_vals[13] = self.initial_weights[14] * input_list[1] + self.initial_weights[15] * input_list[2] + \
+                              self.initial_weights[16] * input_list[3] + self.initial_weights[17] * input_list[4] + \
+                              self.bias_weights[13]  # uses input 1,2,3,4
+        perceptron_vals[14] = self.initial_weights[18] * input_list[3] + self.initial_weights[19] * input_list[4] + \
+                              self.initial_weights[20] * input_list[7] + self.bias_weights[
+                                  14]  # uses inputs 3,4,7
+        perceptron_vals[15] = self.initial_weights[21] * input_list[8] + self.initial_weights[22] * input_list[9] + \
+                              self.initial_weights[23] * input_list[10] + self.bias_weights[
+                                  15]  # uses inputs 8,9,10
+        perceptron_vals[16] = self.initial_weights[24] * input_list[0] + self.initial_weights[25] * input_list[3] + \
+                              self.bias_weights[16]  # uses inputs 0 and 3
 
         # do threshold calcs and decide if perceptron outputs 0 or 1
         for y in range(0, len(perceptron_outs)):
@@ -100,7 +108,7 @@ class AIPlayer(Player):
 
         # init output values
         for z in range(0, len(output_vals)):
-            output_vals[z] = self.outputWeights[z]*perceptron_outs[z]
+            output_vals[z] = self.outputWeights[z] * perceptron_outs[z]
 
         # do the output calc and return the resulting output
         for i in range(0, len(output_vals)):
@@ -286,8 +294,6 @@ class AIPlayer(Player):
         enemy_queen = enemy_inv.getQueen()
         food_drop_offs = [our_tunnel.coords]
         food_drop_offs.append(our_anthill.coords)
-
-
 
         # Total points possible
         total_points = 1
