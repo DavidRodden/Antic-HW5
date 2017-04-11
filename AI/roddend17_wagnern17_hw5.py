@@ -38,6 +38,11 @@ class AIPlayer(Player):
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
         print "something happened"
 
+
+    def back_propogation(self):
+
+        pass
+
     """
     Description:
         Maps a set of inputs from a GameState into a list, that will then
@@ -46,7 +51,6 @@ class AIPlayer(Player):
     Parameters:
         state - GameState to score.
     """
-
     @staticmethod
     def map_input(state):
 
