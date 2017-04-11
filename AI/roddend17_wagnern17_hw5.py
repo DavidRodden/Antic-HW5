@@ -36,8 +36,9 @@ class AIPlayer(Player):
             inputPlayerId - The id to give the new player (int)
         """
         super(AIPlayer, self).__init__(inputPlayerId, "Mr. Brain")
-        print "something happened"
-
+        self.initialWeights = [0.5] * 26
+        self.outputWeights = [0.5] * 17
+        self.perceptronBias = [0.5] * 17
     """
     Description:
         Maps a set of inputs from a GameState into a list, that will then
