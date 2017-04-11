@@ -69,6 +69,7 @@ class AIPlayer(Player):
         self.initial_weights[23] += 0.8 * perc_delta[10] * input_values[15]
         self.initial_weights[24] += 0.8 * perc_delta[0] * input_values[16]
         self.initial_weights[25] += 0.8 * perc_delta[3] * input_values[16]
+        print self.initial_weights
         return None
 
     """
@@ -428,6 +429,8 @@ class AIPlayer(Player):
         """
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
+
+        self.back_propogation([.5] * 17, [.5] * 17, 1, .5)
 
         # If we get a list of moves, just get rid of the END move(s)
         if moves is None:
