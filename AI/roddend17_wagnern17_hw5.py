@@ -98,7 +98,6 @@ class AIPlayer(Player):
                                   15]  # uses inputs 8,9,10
         perceptron_vals[16] = self.initial_weights[24] * input_list[0] + self.initial_weights[25] * input_list[3] + \
                               self.bias_weights[16]  # uses inputs 0 and 3
-
         # do threshold calcs and decide if perceptron outputs 0 or 1
         for y in range(0, len(perceptron_outs)):
             if (perceptron_vals[y] >= threshold):
@@ -473,6 +472,11 @@ class AIPlayer(Player):
         """
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
+
+        temp_list = AIPlayer.map_input(curr_state)
+        my_tuple = self.neural_net(temp_list)
+        target_score = AIPlayer.score_state(curr_state)
+        self.back_propogation(temp_list, my_tuple[0], target_score, my_tuple[1])
 
         self.back_propogation([.5] * 17, [.5] * 17, 1, .5)
 
