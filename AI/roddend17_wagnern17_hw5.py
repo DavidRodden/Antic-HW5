@@ -39,6 +39,13 @@ class AIPlayer(Player):
         self.initialWeights = [0.5] * 26
         self.outputWeights = [0.5] * 17
         self.perceptronBias = [0.5] * 17
+
+    @staticmethod
+    def neural_net(input_list):
+        threshold = 1.5
+        self.initialWeights[0]*input_list[0]
+
+
     """
     Description:
         Maps a set of inputs from a GameState into a list, that will then
