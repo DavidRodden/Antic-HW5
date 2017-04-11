@@ -83,13 +83,13 @@ class AIPlayer(Player):
 
         # init perceptron values
         for x in range(0, len(input_list)):
-            perceptron_vals[x] = self.initialWeights[x]*input_list[x] + self.perceptronBiasWeights[x]
+            perceptron_vals[x] = self.initial_weights[x]*input_list[x] + self.perceptronBiasWeights[x]
 
-        perceptron_vals[12] = self.initialWeights[12]*input_list[0] + self.initialWeights[13]*input_list[1] + self.perceptronBiasWeights[12]#uses inputs 0 and 1
-        perceptron_vals[13] = self.initialWeights[14]*input_list[1] + self.initialWeights[15]*input_list[2] + self.initialWeights[16]*input_list[3] + self.initialWeights[17]*input_list[4] + self.perceptronBiasWeights[13] #uses input 1,2,3,4
-        perceptron_vals[14] = self.initialWeights[18]*input_list[3] + self.initialWeights[19]*input_list[4] + self.initialWeights[20]*input_list[7] + self.perceptronBiasWeights[14] #uses inputs 3,4,7
-        perceptron_vals[15] = self.initialWeights[21]*input_list[8] + self.initialWeights[22]*input_list[9] + self.initialWeights[23]*input_list[10] + self.perceptronBiasWeights[15] #uses inputs 8,9,10
-        perceptron_vals[16] = self.initialWeights[24]*input_list[0] + self.initialWeights[25]*input_list[3] + self.perceptronBiasWeights[16] #uses inputs 0 and 3
+        perceptron_vals[12] = self.initial_weights[12]*input_list[0] + self.initial_weights[13]*input_list[1] + self.perceptronBiasWeights[12]#uses inputs 0 and 1
+        perceptron_vals[13] = self.initial_weights[14]*input_list[1] + self.initial_weights[15]*input_list[2] + self.initial_weights[16]*input_list[3] + self.initial_weights[17]*input_list[4] + self.perceptronBiasWeights[13] #uses input 1,2,3,4
+        perceptron_vals[14] = self.initial_weights[18]*input_list[3] + self.initial_weights[19]*input_list[4] + self.initial_weights[20]*input_list[7] + self.perceptronBiasWeights[14] #uses inputs 3,4,7
+        perceptron_vals[15] = self.initial_weights[21]*input_list[8] + self.initial_weights[22]*input_list[9] + self.initial_weights[23]*input_list[10] + self.perceptronBiasWeights[15] #uses inputs 8,9,10
+        perceptron_vals[16] = self.initial_weights[24]*input_list[0] + self.initial_weights[25]*input_list[3] + self.perceptronBiasWeights[16] #uses inputs 0 and 3
 
         # do threshold calcs and decide if perceptron outputs 0 or 1
         for y in range(0, len(perceptron_outs)):
@@ -467,6 +467,11 @@ class AIPlayer(Player):
         """
         # Make a root pseudo-node
         root = Node(None, curr_state, -1)
+
+        temp_list = AIPlayer.map_input(curr_state)
+        my_tuple = self.neural_net(temp_list)
+        target_score = AIPlayer.score_state(curr_state)
+        self.back_propogation(temp_list, my_tuple[0], target_score, my_tuple[1])
 
         self.back_propogation([.5] * 17, [.5] * 17, 1, .5)
 
