@@ -108,7 +108,7 @@ class AIPlayer(Player):
 
         # init output values
         for z in range(0, len(output_vals)):
-            output_vals[z] = self.outputWeights[z] * perceptron_outs[z]
+            output_vals[z] = self.output_weights[z] * perceptron_outs[z]
 
         # do the output calc and return the resulting output
         for i in range(0, len(output_vals)):
