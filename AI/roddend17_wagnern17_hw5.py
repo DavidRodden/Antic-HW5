@@ -40,6 +40,8 @@ class AIPlayer(Player):
         self.output_weights = [0.5] * 17
         self.bias_weights = [0.5] * 17
 
+    # input_values: output of mapping f'n
+    # hidden_output: zeroeth output of neural net f'n
     def back_propogation(self, input_values, hidden_output, target, actual):
         error = target - actual
         delta = actual * (1 - actual) * error
